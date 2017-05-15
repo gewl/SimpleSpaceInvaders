@@ -7,6 +7,10 @@ function Game() {
 
 	this.intervalId = null;
 	this.travelingLeft = true;
+	this.enemyMovementTimer = 3;
+
+	this.playerX = 7;
+	this.playerY = 14;
 
 	// object positioins	
 	this.cells = [
@@ -51,58 +55,72 @@ Game.prototype.start = function() {
 }
 
 Game.prototype.loop = function() {
+	this.moveEnemies();
+
+
+	this.draw();
+}
+
+Game.prototype.moveEnemies = function() {
 	var width = this.cells.length
-	if (this.travelingLeft) {
-		var atLeftEdge = false;
+	this.enemyMovementTimer--;
 
-		for (var i = 0; i < width; i++) {
-			if (this.cells[i][0] === "E") {
-				atLeftEdge = true;
-				break;
+	if (!this.enemyMovementTimer) {
+		this.enemyMovementTimer = 3;
+
+		if (this.travelingLeft) {
+			var atLeftEdge = false;
+
+			for (var i = 0; i < width; i++) {
+				if (this.cells[i][0] === "E") {
+					atLeftEdge = true;
+					break;
+				}
 			}
-		}
 
-		if (atLeftEdge) {
-			this.travelingLeft = false;
-		} else {
-			for (var y = 0; y < width; y++) {
-				var row = this.cells[y];
-				for (var x = 0; x < width; x++) {
-					var cell = row[x];
-					if (cell === "E") {
-						row[x-1] = "E";
-						row[x] = 0;
+			if (atLeftEdge) {
+				this.travelingLeft = false;
+				// prevents ugly lingering on edges
+				this.enemyMovementTimer = 1;
+			} else {
+				for (var y = 0; y < width; y++) {
+					var row = this.cells[y];
+					for (var x = 0; x < width; x++) {
+						var cell = row[x];
+						if (cell === "E") {
+							row[x-1] = "E";
+							row[x] = 0;
+						}
 					}
 				}
 			}
-		}
-	} else {
-		var atRightEdge = false;
-
-		for (var i = 0; i < width; i++) {
-			if (this.cells[i][width-1] === "E") {
-				atRightEdge = true;
-				break;
-			}
-		}
-
-		if (atRightEdge) {
-			this.travelingLeft = true;
 		} else {
-			for (var y = width - 1; y >= 0; y--) {
-				var row = this.cells[y];
-				for (var x = width - 1; x >= 0; x--) {
-					var cell = row[x];
-					if (cell === "E") {
-						row[x+1] = "E";
-						row[x] = 0;
+			var atRightEdge = false;
+
+			for (var i = 0; i < width; i++) {
+				if (this.cells[i][width-1] === "E") {
+					atRightEdge = true;
+					break;
+				}
+			}
+
+			if (atRightEdge) {
+				this.travelingLeft = true;
+				this.enemyMovementTimer = 1;
+			} else {
+				for (var y = width - 1; y >= 0; y--) {
+					var row = this.cells[y];
+					for (var x = width - 1; x >= 0; x--) {
+						var cell = row[x];
+						if (cell === "E") {
+							row[x+1] = "E";
+							row[x] = 0;
+						}
 					}
 				}
 			}
 		}
 	}
-
-	this.draw();
 }
 
 // draw board onto canvas
@@ -140,12 +158,6 @@ Game.prototype.drawCell = function(cell, x, y) {
 			ctx.fillStyle = "white";
 			break;
 	}
-
-	// ctx.beginPath();
-	// ctx.arc(x + cellWidth/2, y + cellWidth/2, cellWidth/2 - 3, 0, Math.PI*2, true);
-	// ctx.lineWidth = 1;
-	// ctx.fill();
-	// ctx.stroke();
 
 	this.ctx.fillRect(x * this.cellWidth, y * this.cellWidth, this.cellWidth, this.cellWidth);
 
