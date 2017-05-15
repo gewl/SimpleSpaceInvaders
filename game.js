@@ -12,6 +12,9 @@ function Game() {
 	this.playerX = 7;
 	this.playerY = 14;
 
+	this.moveLeft = false;
+	this.moveRight = false;
+
 	// object positioins	
 	this.cells = [
 		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -44,6 +47,15 @@ Game.prototype.initialize = function() {
 
 	document.body.appendChild(canvas);
 
+	var game = this;
+	window.addEventListener("keydown", function(e) {
+		if (e.which === 37) {
+			game.moveLeft = true;
+		} else if (e.which === 39) {
+			game.moveRight = true;
+		}
+	})
+
 	this.draw()
 }
 
@@ -56,9 +68,29 @@ Game.prototype.start = function() {
 
 Game.prototype.loop = function() {
 	this.moveEnemies();
-
-
+	this.movePlayer();
 	this.draw();
+}
+
+Game.prototype.movePlayer = function() {
+	if (this.moveLeft) {
+		var x = this.playerX, y = this.playerY, newX = x-1;
+
+		this.cells[y][newX] = "P";
+		this.cells[y][x] = 0;
+		this.playerX = newX;
+
+		this.moveLeft = false;
+	}
+	if (this.moveRight) {
+		var x = this.playerX, y = this.playerY, newX = x+1;
+
+		this.cells[y][newX] = "P";
+		this.cells[y][x] = 0;
+		this.playerX = newX;
+
+		this.moveRight = false;
+	}
 }
 
 Game.prototype.moveEnemies = function() {
