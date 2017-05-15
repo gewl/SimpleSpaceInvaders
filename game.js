@@ -49,6 +49,7 @@ Game.prototype.initialize = function() {
 
 	var game = this;
 	window.addEventListener("keydown", function(e) {
+		// left & right arrow keys flag booleans for movement on next frame
 		if (e.which === 37) {
 			game.moveLeft = true;
 		} else if (e.which === 39) {
@@ -76,18 +77,22 @@ Game.prototype.movePlayer = function() {
 	if (this.moveLeft) {
 		var x = this.playerX, y = this.playerY, newX = x-1;
 
-		this.cells[y][newX] = "P";
-		this.cells[y][x] = 0;
-		this.playerX = newX;
+		if (newX >= 0){
+			this.cells[y][newX] = "P";
+			this.cells[y][x] = 0;
+			this.playerX = newX;
+		}
 
 		this.moveLeft = false;
 	}
 	if (this.moveRight) {
 		var x = this.playerX, y = this.playerY, newX = x+1;
 
-		this.cells[y][newX] = "P";
-		this.cells[y][x] = 0;
-		this.playerX = newX;
+		if (newX < this.cells.length) {
+			this.cells[y][newX] = "P";
+			this.cells[y][x] = 0;
+			this.playerX = newX;
+		}
 
 		this.moveRight = false;
 	}
